@@ -1,0 +1,32 @@
+{
+  "git.branchProtection": [
+    "main",
+    "master"
+  ],
+  "github.copilot.chat.reviewSelection.enabled": true,
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "github.copilot.chat.copilotMemory.enabled": true,
+  "chat.customAgentInSubagent.enabled": true,
+  "chat.viewSessions.orientation": "stacked",
+  "chat.promptFilesRecommendations": {
+    "organize": true,
+    "prompt-confirm": true
+  },
+    "claudeCode.preferredLocation": "sidebar",
+    "chat.agentFilesLocations": {
+      "~/ai-catalog/agents": true,
+      "~/.github/agents": true
+    },
+    "chat.agentSkillsLocations": {
+      "~/ai-catalog/skills": true,
+      "~/.github/skills": true
+    },
+    "chat.instructionsFilesLocations": {
+      "~/ai-catalog/instructions": true,
+      "~/.github/instructions": true
+    },
+    "chat.promptFilesLocations": {
+      "~/ai-catalog/prompts": true,
+      "~/.github/prompts": true
+    },
+}

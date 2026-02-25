@@ -3,7 +3,7 @@
   "displayName": "Copilot Chime",
   "description": "Plays pleasant chime sounds when GitHub Copilot completes a task or needs user interaction.",
   "version": "0.1.0",
-  "publisher": "HatchetSoftware",
+  "publisher": "hatchetsoftwarellc",
   "license": "MIT",
   "repository": {
     "type": "git",

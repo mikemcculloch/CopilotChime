@@ -1,0 +1,38 @@
+{
+  "inputs": [
+    {
+      "id": "ado_org",
+      "type": "promptString",
+      "description": "Azure DevOps organization name  (e.g. 'contoso')"
+    },
+    {
+      "id": "postman-api-key",
+      "type": "promptString",
+      "description": "Postman API Key"
+    }
+  ],
+  "servers": {
+    "postman-api-http-server": {
+      "type": "http",
+      "url": "https://mcp.postman.com/minimal",
+      "headers": {
+        "Authorization": "Bearer ${input:postman-api-key}"
+      }
+    },
+    "microsoft-learn": {
+      "type": "http",
+      "url": "https://learn.microsoft.com/api/mcp"
+    },
+    "ado": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@azure-devops/mcp",
+        "${input:ado_org}",
+        "-d",
+        "search"
+      ]
+    }
+  }
+}

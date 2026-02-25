@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Copilot Chime",
+            "type": "extensionHost",
+            "request": "launch",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}/Chime"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/Chime/out/**/*.js"
+            ],
+            "preLaunchTask": "compile"
+        }
+    ]
+}
