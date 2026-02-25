@@ -2,7 +2,7 @@
   "name": "copilot-chime",
   "displayName": "Copilot Chime",
   "description": "Audio notifications for GitHub Copilot. Hear a chime when tasks complete, when Copilot needs your input, or when terminal commands finish. Never miss a prompt again.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "hatchetsoftwarellc",
   "license": "MIT",
   "repository": {
@@ -54,6 +54,43 @@
         "command": "copilotChime.configure",
         "title": "Copilot Chime: Configure Chimes",
         "icon": "$(settings-gear)"
+      }
+    ],
+    "languageModelTools": [
+      {
+        "name": "copilotChime-notify",
+        "tags": [
+          "chime",
+          "notification",
+          "sound",
+          "alert"
+        ],
+        "toolReferenceName": "chime",
+        "displayName": "Copilot Chime",
+        "modelDescription": "Plays an audible notification chime for the user. Call this tool whenever: (1) you have finished a significant task or multi-step operation and want to notify the user ('complete'), (2) you need the user to review something, answer a question, make a decision, approve a plan, or provide input before you can continue ('prompt'), or (3) something unexpected happened that the user should be aware of ('attention'). Always prefer type 'prompt' when you are waiting on the user.",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(bell)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "complete",
+                "attention",
+                "prompt"
+              ],
+              "description": "The kind of chime to play. Use 'complete' when a task finishes, 'prompt' when user interaction is needed, 'attention' for important alerts."
+            },
+            "message": {
+              "type": "string",
+              "description": "Optional short message shown to the user alongside the chime."
+            }
+          },
+          "required": [
+            "type"
+          ]
+        }
       }
     ],
     "configuration": {
