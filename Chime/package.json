@@ -1,8 +1,8 @@
 {
   "name": "copilot-chime",
   "displayName": "Copilot Chime",
-  "description": "Plays pleasant chime sounds when GitHub Copilot completes a task or needs user interaction.",
-  "version": "0.1.0",
+  "description": "Audio notifications for GitHub Copilot — hear a chime when tasks complete, when Copilot needs your input, or when terminal commands finish. Never miss a prompt again.",
+  "version": "0.1.1",
   "publisher": "hatchetsoftwarellc",
   "license": "MIT",
   "repository": {
@@ -95,8 +95,8 @@
         "copilotChime.volume": {
           "type": "number",
           "default": 0.1,
-          "minimum": 0.0,
-          "maximum": 1.0,
+          "minimum": 0,
+          "maximum": 1,
           "description": "Volume level for chime sounds (0.0 to 1.0)."
         },
         "copilotChime.completeSound": {
