@@ -1,0 +1,202 @@
+{
+  "name": "copilot-chime",
+  "displayName": "Copilot Chime",
+  "description": "Plays pleasant chime sounds when GitHub Copilot completes a task or needs user interaction.",
+  "version": "0.1.0",
+  "publisher": "HatchetSoftware",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikemcculloch/CopilotChime.git"
+  },
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other",
+    "Chat"
+  ],
+  "keywords": [
+    "copilot",
+    "chime",
+    "notification",
+    "sound",
+    "audio",
+    "accessibility"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "icon": "images/icon.png",
+  "contributes": {
+    "commands": [
+      {
+        "command": "copilotChime.playComplete",
+        "title": "Copilot Chime: Play Completion Sound",
+        "icon": "$(bell)"
+      },
+      {
+        "command": "copilotChime.playAttention",
+        "title": "Copilot Chime: Play Attention Sound",
+        "icon": "$(bell-dot)"
+      },
+      {
+        "command": "copilotChime.toggle",
+        "title": "Copilot Chime: Toggle Sounds On/Off",
+        "icon": "$(bell)"
+      },
+      {
+        "command": "copilotChime.setVolume",
+        "title": "Copilot Chime: Set Volume",
+        "icon": "$(unmute)"
+      },
+      {
+        "command": "copilotChime.configure",
+        "title": "Copilot Chime: Configure Chimes",
+        "icon": "$(settings-gear)"
+      }
+    ],
+    "configuration": {
+      "title": "Copilot Chime",
+      "properties": {
+        "copilotChime.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable all Copilot Chime sounds."
+        },
+        "copilotChime.onTerminalComplete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Play a sound when a terminal command completes (useful for Copilot agent mode)."
+        },
+        "copilotChime.onToolComplete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Play a completion chime when Copilot calls the #chime tool with type 'complete'."
+        },
+        "copilotChime.onToolAttention": {
+          "type": "boolean",
+          "default": false,
+          "description": "Play an attention chime when Copilot calls the #chime tool with type 'attention'."
+        },
+        "copilotChime.onToolPrompt": {
+          "type": "boolean",
+          "default": true,
+          "description": "Play a prompt chime when Copilot needs user interaction, input, or approval."
+        },
+        "copilotChime.terminalDebounceMs": {
+          "type": "number",
+          "default": 3000,
+          "minimum": 500,
+          "maximum": 30000,
+          "description": "Debounce interval (ms) for terminal completion chimes. Prevents rapid chimes when multiple commands run in sequence."
+        },
+        "copilotChime.volume": {
+          "type": "number",
+          "default": 0.1,
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Volume level for chime sounds (0.0 to 1.0)."
+        },
+        "copilotChime.completeSound": {
+          "type": "string",
+          "enum": [
+            "chime",
+            "bell",
+            "ping",
+            "success"
+          ],
+          "enumDescriptions": [
+            "Pleasant ascending three-note chime",
+            "Rich bell tone with harmonics",
+            "Short, clean single-note ping",
+            "Cheerful ascending major triad"
+          ],
+          "default": "chime",
+          "description": "Sound to play on task completion."
+        },
+        "copilotChime.attentionSound": {
+          "type": "string",
+          "enum": [
+            "chime",
+            "bell",
+            "ping",
+            "alert",
+            "prompt"
+          ],
+          "enumDescriptions": [
+            "Pleasant ascending three-note chime",
+            "Rich bell tone with harmonics",
+            "Short, clean single-note ping",
+            "Two-tone alternating alert",
+            "Gentle rising two-note nudge"
+          ],
+          "default": "bell",
+          "description": "Sound to play when user attention is needed."
+        },
+        "copilotChime.promptSound": {
+          "type": "string",
+          "enum": [
+            "prompt",
+            "chime",
+            "bell",
+            "ping",
+            "alert"
+          ],
+          "enumDescriptions": [
+            "Gentle rising two-note nudge (default)",
+            "Pleasant ascending three-note chime",
+            "Rich bell tone with harmonics",
+            "Short, clean single-note ping",
+            "Two-tone alternating alert"
+          ],
+          "default": "prompt",
+          "description": "Sound to play when Copilot needs user interaction or approval."
+        }
+      }
+    },
+    "languageModelTools": [
+      {
+        "name": "copilotChime-notify",
+        "displayName": "Chime",
+        "toolReferenceName": "chime",
+        "icon": "$(bell)",
+        "canBeReferencedInPrompt": true,
+        "modelDescription": "Plays a notification chime sound to alert the user. Call this tool when: (1) You have completed a task or series of tasks the user asked you to perform — use type 'complete', (2) You need the user's attention, input, approval, or are asking a question before continuing — use type 'prompt', (3) The user explicitly asks to be notified or chimed — use type 'complete'. The chime plays even when VS Code is not focused, so the user knows to come back. ALWAYS use type 'prompt' when you are asking the user a question, presenting options for them to choose, or waiting for their approval before proceeding.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "complete",
+                "attention",
+                "prompt"
+              ],
+              "description": "The notification type: 'complete' for task completion, 'prompt' when asking a question or needing user input/approval, 'attention' for general alerts."
+            },
+            "message": {
+              "type": "string",
+              "description": "A brief message explaining what happened or what is needed from the user."
+            }
+          },
+          "required": [
+            "type"
+          ]
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.96.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.5.0"
+  }
+}
