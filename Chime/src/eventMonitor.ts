@@ -17,6 +17,7 @@ export class EventMonitor implements vscode.Disposable {
     private readonly log: (msg: string) => void;
 
     private terminalDebounceTimer: ReturnType<typeof setTimeout> | undefined;
+    private approvalNudgeTimer: ReturnType<typeof setTimeout> | undefined;
 
     constructor(soundPlayer: SoundPlayer, outputChannel?: { appendLine(msg: string): void }) {
         this.soundPlayer = soundPlayer;
@@ -88,6 +89,7 @@ export class EventMonitor implements vscode.Disposable {
         const onToolComplete = config.get<boolean>('onToolComplete', true);
         const onToolAttention = config.get<boolean>('onToolAttention', false);
         const onToolPrompt = config.get<boolean>('onToolPrompt', true);
+        const onCommandApproval = config.get<boolean>('onCommandApproval', true);
         const completeSound = config.get<SoundType>('completeSound', 'chime');
         const attentionSound = config.get<SoundType>('attentionSound', 'bell');
         const promptSound = config.get<SoundType>('promptSound', 'prompt');
@@ -121,6 +123,13 @@ export class EventMonitor implements vscode.Disposable {
                 picked: onToolAttention,
                 key: 'onToolAttention',
             },
+            {
+                label: '$(terminal-bash) Command Approval',
+                description: `sound: ${promptSound}`,
+                detail: 'Chime when Copilot is likely waiting for terminal command approval',
+                picked: onCommandApproval,
+                key: 'onCommandApproval',
+            },
         ];
 
         const picked = await vscode.window.showQuickPick(items, {
@@ -135,6 +144,7 @@ export class EventMonitor implements vscode.Disposable {
             await config.update('onToolComplete', pickedKeys.has('onToolComplete'), vscode.ConfigurationTarget.Global);
             await config.update('onToolPrompt', pickedKeys.has('onToolPrompt'), vscode.ConfigurationTarget.Global);
             await config.update('onToolAttention', pickedKeys.has('onToolAttention'), vscode.ConfigurationTarget.Global);
+            await config.update('onCommandApproval', pickedKeys.has('onCommandApproval'), vscode.ConfigurationTarget.Global);
 
             // Offer to change sounds for the enabled types
             const soundOptions: { label: string; value: string }[] = [
@@ -262,6 +272,10 @@ export class EventMonitor implements vscode.Disposable {
                         clearTimeout(this.terminalDebounceTimer);
                         this.terminalDebounceTimer = undefined;
                     }
+                    if (this.approvalNudgeTimer) {
+                        clearTimeout(this.approvalNudgeTimer);
+                        this.approvalNudgeTimer = undefined;
+                    }
                 }),
             );
         }
@@ -286,6 +300,21 @@ export class EventMonitor implements vscode.Disposable {
                         this.terminalDebounceTimer = undefined;
                         this.log('terminal debounce fired — playing chime');
                         await this.soundPlayer.play(cfg.completeSound, cfg.volume);
+
+                        // After the completion chime, start a secondary timer
+                        // to nudge the user if Copilot is likely waiting for
+                        // terminal command approval.
+                        if (cfg.onCommandApproval) {
+                            this.log(`approval nudge started (${cfg.commandApprovalDelayMs}ms)`);
+                            this.approvalNudgeTimer = setTimeout(async () => {
+                                this.approvalNudgeTimer = undefined;
+                                const freshCfg = this.cfg();
+                                if (freshCfg.enabled && freshCfg.onCommandApproval) {
+                                    this.log('approval nudge fired — playing prompt chime');
+                                    await this.soundPlayer.play(freshCfg.promptSound, freshCfg.volume);
+                                }
+                            }, cfg.commandApprovalDelayMs);
+                        }
                     }, cfg.terminalDebounceMs);
                 }),
             );
@@ -302,6 +331,8 @@ export class EventMonitor implements vscode.Disposable {
             onToolComplete: config.get<boolean>('onToolComplete', true),
             onToolAttention: config.get<boolean>('onToolAttention', false),
             onToolPrompt: config.get<boolean>('onToolPrompt', true),
+            onCommandApproval: config.get<boolean>('onCommandApproval', true),
+            commandApprovalDelayMs: config.get<number>('commandApprovalDelayMs', 8000),
             terminalDebounceMs: config.get<number>('terminalDebounceMs', 3000),
             volume: config.get<number>('volume', 0.1),
             completeSound: config.get<SoundType>('completeSound', 'chime'),
@@ -330,6 +361,9 @@ export class EventMonitor implements vscode.Disposable {
     dispose(): void {
         if (this.terminalDebounceTimer) {
             clearTimeout(this.terminalDebounceTimer);
+        }
+        if (this.approvalNudgeTimer) {
+            clearTimeout(this.approvalNudgeTimer);
         }
         this.statusBarItem.dispose();
         for (const d of this.disposables) {

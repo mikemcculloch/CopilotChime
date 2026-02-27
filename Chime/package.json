@@ -121,6 +121,18 @@
           "default": true,
           "description": "Play a prompt chime when Copilot needs user interaction, input, or approval."
         },
+        "copilotChime.onCommandApproval": {
+          "type": "boolean",
+          "default": true,
+          "description": "Play a prompt chime when Copilot is likely waiting for terminal command approval (agent mode)."
+        },
+        "copilotChime.commandApprovalDelayMs": {
+          "type": "number",
+          "default": 8000,
+          "minimum": 2000,
+          "maximum": 30000,
+          "description": "Delay (ms) after a terminal command finishes before playing the approval-prompt chime. If a new command starts before this fires, the chime is cancelled."
+        },
         "copilotChime.terminalDebounceMs": {
           "type": "number",
           "default": 3000,
